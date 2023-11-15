@@ -52,7 +52,7 @@ jobs:
         WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
 
     - name: Run WizCLI (Docker) Image Scan
-      run: ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --policy "${CICD_POLICIES}" --policy-hits-only --output "${OUTPUT_FILE}",sarif,true
+      run: ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --driver mountWithLayers --policy "${CICD_POLICIES}" --policy-hits-only --output "${OUTPUT_FILE}",sarif,true
 
     - name: Push Docker Image
       if: ${{ env.ENABLE_WIZ_DOCKER_TAG == 'true' }}
