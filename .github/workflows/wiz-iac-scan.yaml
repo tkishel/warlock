@@ -16,7 +16,7 @@ jobs:
         shell: bash
     runs-on: ubuntu-latest
     env:
-      SCAN_PATH: "../../terraform"
+      SCAN_PATH: "terraform"
       # CICD_POLICIES: "SL-Demo-Misconfigurations,SL-Demo-Secrets,SL-Demo-Vulnerabilities"
       CICD_POLICIES: "SL-Demo-Misconfigurations-Block,SL-Demo-Secrets-Block,SL-Demo-Vulnerabilities-Block"
       OUTPUT_FILE: "wiz-iac-scan-results.json"
