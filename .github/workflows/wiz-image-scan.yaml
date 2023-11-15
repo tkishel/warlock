@@ -18,7 +18,7 @@ jobs:
     env:
       SCAN_PATH: "images"
       # CICD_POLICIES: "SL-Demo-Secrets,SL-Demo-Vulnerabilities"
-      CICD_POLICIES: "SL-Demo-Secrets-Block,SL-Demo-Secrets-Vulnerabilities"
+      CICD_POLICIES: "SL-Demo-Secrets-Block,SL-Demo-Vulnerabilities-Block"
       OUTPUT_FILE: "wiz-image-scan-results.json"
       IMAGE: "wizard/wiz-example-image"
       TAG: ${{ github.run_number }}
