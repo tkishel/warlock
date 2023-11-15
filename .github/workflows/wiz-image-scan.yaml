@@ -27,7 +27,7 @@ jobs:
     steps:
     # This action checks-out your repository, so third-party tools can access it.
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Docker Login
       if: ${{ env.ENABLE_WIZ_DOCKER_TAG == 'true' }}
