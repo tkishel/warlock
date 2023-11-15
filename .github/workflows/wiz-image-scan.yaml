@@ -64,7 +64,7 @@ jobs:
         docker images --digests
         ./wizcli docker tag --image "${IMAGE}:${TAG}"
 
-    # This action uploads SARIFs files, so you can see code scanning alerts from third-party tools in your repository.
+    # This action uploads SARIF files, so you can see code scanning alerts from third-party tools in your repository.
     - uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: ${OUTPUT_FILE}
