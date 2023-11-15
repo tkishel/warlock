@@ -1,4 +1,5 @@
-# https://docs.wiz.io/wiz-docs/docs/github-pipeline
+# See also: https://docs.wiz.io/wiz-docs/docs/github-pipeline
+# For personal use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
 
 name: 'wizcli'
 
@@ -15,9 +16,9 @@ jobs:
         shell: bash
     runs-on: ubuntu-latest
     env:
-      SCAN_PATH: "../../terraform"             # Set the relative path in the repo to scan.
-      CICD_POLICY: "Shift-Left-Demo-IaC"       # Set the Wiz CI/CD policy to use.
-      OUTPUT_FILE: "wiz-iac-scan-results.json" # Set the output file to use.
+      SCAN_PATH: "../../terraform"
+      CICD_POLICIES: "SL-Demo-Misconfigurations,SL-Demo-Secrets,SL-Demo-Vulnerabilities"
+      OUTPUT_FILE: "wiz-iac-scan-results.json"
 
     steps:
     # This action checks-out your repository, so third-party tools can access it.
@@ -33,11 +34,11 @@ jobs:
       run: ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
       # Secrets allow you to store sensitive information (credentials) in your organization, repository, or repository environments.
       env:
-        WIZ_CLIENT_ID: ${{secrets.WIZ_CLIENT_ID}}
-        WIZ_CLIENT_SECRET: ${{secrets.WIZ_CLIENT_SECRET}}
+        WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
+        WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
 
     - name: Run WizCLI IaC Scan 
-      run: ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_POLICY}" --policy-hits-only --output "${OUTPUT_FILE}",sarif,true
+      run: ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_POLICIES}" --policy-hits-only --output "${OUTPUT_FILE}",sarif,true
 
     # This action uploads SARIF files to your repository, so you can see code scanning alerts from third-party tools.
     - uses: github/codeql-action/upload-sarif@v2

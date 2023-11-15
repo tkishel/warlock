@@ -1,4 +1,5 @@
-# https://docs.wiz.io/wiz-docs/docs/github-pipeline
+# See also: https://docs.wiz.io/wiz-docs/docs/github-pipeline
+# For personal use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
 
 name: 'wizcli'
 
@@ -15,27 +16,27 @@ jobs:
         shell: bash
     runs-on: ubuntu-latest
     env:
-      SCAN_PATH: "../../images"                  # Set the relative path in the repo to scan.
-      CICD_POLICY: "Shift-Left-Demo-Images"      # Set the Wiz CI/CD policy to use.
-      OUTPUT_FILE: "wiz-image-scan-results.json" # Set the output file to use.
+      SCAN_PATH: "../../images"
+      CICD_POLICIES: "SL-Demo-Misconfigurations,SL-Demo-Secrets,SL-Demo-Vulnerabilities"
+      OUTPUT_FILE: "wiz-image-scan-results.json"
       IMAGE: "wizard/wiz-example-image"
-      TAG: ${{github.run_number}}
+      TAG: ${{ github.run_number }}
+      ENABLE_WIZ_DOCKER_TAG: "false"
 
     steps:
     # This action checks-out your repository, so third-party tools can access it.
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    # For use with "wizcli docker tag"
-    # - name: Docker Login
-    #   uses: docker/login-action@v3.0.0
-    #   with:
-    #     username: ${{secrets.GH_USER}}
-    #     password: ${{secrets.GH_PASS}}
+    - name: Docker Login
+      if: ${{ env.ENABLE_WIZ_DOCKER_TAG == 'true' }}
+      uses: docker/login-action@v3.0.0
+      with:
+        username: ${{ secrets.GH_USER }}
+        password: ${{ secrets.GH_PASS }}
 
     - name: Build the Docker Image
-      run: docker build "${{SCAN_PATH}}" -t "${IMAGE}:${TAG}"
-      if: always()
+      run: docker build "${SCAN_PATH}" -t "${IMAGE}:${TAG}"
 
     - name: Download WizCLI
       run: curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
@@ -46,22 +47,22 @@ jobs:
       run: ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
       # Secrets allow you to store sensitive information (credentials) in your organization, repository, or repository environments.
       env:
-        WIZ_CLIENT_ID: ${{secrets.WIZ_CLIENT_ID}}
-        WIZ_CLIENT_SECRET: ${{secrets.WIZ_CLIENT_SECRET}}
+        WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
+        WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
 
     - name: Run WizCLI (Docker) Image Scan
-      run: ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${{SCAN_PATH}}/Dockerfile" --policy "${CICD_POLICY}" --policy-hits-only --output "${OUTPUT_FILE}",sarif,true
+      run: ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --policy "${CICD_POLICIES}" --policy-hits-only --output "${OUTPUT_FILE}",sarif,true
 
-    # For use with "wizcli docker tag"
-    # - name: Push Docker Image 
-    #   run: docker push $IMAGE:$TAG
+    - name: Push Docker Image
+      if: ${{ env.ENABLE_WIZ_DOCKER_TAG == 'true' }}
+      run: docker push "${IMAGE}:${TAG}"
 
-    # For use with "wizcli docker tag"
-    # - name: Run WizCLI Docker Tag
-    #   run: |
-    #     docker images list
-    #     docker images --digests
-    #     ./wizcli docker tag --image $IMAGE:$TAG
+    - name: WizCLI Docker Tag
+      if: ${{ env.ENABLE_WIZ_DOCKER_TAG == 'true' }}
+      run: |
+        docker images list
+        docker images --digests
+        ./wizcli docker tag --image "${IMAGE}:${TAG}"
 
     # This action uploads SARIFs files, so you can see code scanning alerts from third-party tools in your repository.
     - uses: github/codeql-action/upload-sarif@v2
