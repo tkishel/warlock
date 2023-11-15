@@ -1,7 +1,7 @@
 # See also: https://docs.wiz.io/wiz-docs/docs/github-pipeline
 # For personal use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
 
-name: 'wizcli'
+name: 'wiz-iac-scan'
 
 on: 
   pull_request:
@@ -18,7 +18,7 @@ jobs:
     env:
       SCAN_PATH: "../../terraform"
       # CICD_POLICIES: "SL-Demo-Misconfigurations,SL-Demo-Secrets,SL-Demo-Vulnerabilities"
-      CICD_POLICIES_BLOCK: "SL-Demo-Misconfigurations-Block,SL-Demo-Secrets-Block,SL-Demo-Vulnerabilities-Block"
+      CICD_POLICIES: "SL-Demo-Misconfigurations-Block,SL-Demo-Secrets-Block,SL-Demo-Vulnerabilities-Block"
       OUTPUT_FILE: "wiz-iac-scan-results.json"
 
     steps:

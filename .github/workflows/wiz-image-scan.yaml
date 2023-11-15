@@ -1,7 +1,7 @@
 # See also: https://docs.wiz.io/wiz-docs/docs/github-pipeline
 # For personal use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
 
-name: 'wizcli'
+name: 'wiz-image-scan'
 
 on: 
   pull_request:
