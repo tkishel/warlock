@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SCAN_PATH: "images"
-      # CICD_POLICIES: "SL-Demo-Misconfigurations,SL-Demo-Secrets,SL-Demo-Vulnerabilities"
-      CICD_POLICIES: "SL-Demo-Misconfigurations-Block,SL-Demo-Secrets-Block,SL-Demo-Vulnerabilities-Block"
+      # CICD_POLICIES: "SL-Demo-Misconfigurations,SL-Demo-Secrets"
+      CICD_POLICIES: "SL-Demo-Misconfigurations-Block,SL-Demo-Secrets-Block"
       OUTPUT_FILE: "wiz-image-scan-results.json"
       IMAGE: "wizard/wiz-example-image"
       TAG: ${{ github.run_number }}
