@@ -15,31 +15,29 @@ on:
     branches: 
     - main
     # Optionally modify 'paths' to match your demo use case.
-    # For example:
-    # To trigger this action on changes to all resources, change 'paths' to:     - 'terraform/**'
-    # To trigger this action on changes to all AWS resources, change 'paths' to: - 'terraform/aws/**'
+    # For example: to trigger this action on changes to all terraform files, use:
+    # - 'terraform/**'
     paths:
     - 'terraform/aws/example.tf'
 
 jobs:
   wiz-iac-scan:
     name: 'WizCLI IaC Scan'
+    env:
+      # Optionally modify 'SCAN_PATH' to match your demo use case.
+      # For example: to scan all terraform files:
+      # SCAN_PATH: 'terraform'
+      SCAN_PATH: 'terraform/aws/example.tf'
+      # Optionally modify 'CICD_POLICIES' to match your demo use case.
+      # For example, to check for all Misconfigurations and Audit all rather than Block:
+      # CICD_POLICIES: 'ShiftLeft-Demo-Misconfigurations,ShiftLeft-Demo-Secrets'
+      CICD_POLICIES: 'ShiftLeft-Demo-Misconfigurations-Example,ShiftLeft-Demo-Secrets-Block'
+      OUTPUT_FILE: 'wiz-iac-scan-results.json'
+
     defaults:
       run:
         shell: bash
     runs-on: ubuntu-latest
-    env:
-      # Optionally modify 'SCAN_PATH' to match your demo use case.
-      # For example:
-      # To scan all resources, change to:     'terraform'
-      # To scan all AWS resources, change to: 'terraform/aws'
-      SCAN_PATH: 'terraform/aws/example.tf'
-      # Optionally modify 'CICD_POLICIES' to match your demo use case.
-      # For example, to Audit rather than Block:
-      # CICD_POLICIES: 'ShiftLeft-Demo-Misconfigurations,ShiftLeft-Demo-Secrets'
-      # CICD_POLICIES: 'ShiftLeft-Demo-Misconfigurations-Block,ShiftLeft-Demo-Secrets-Block'
-      CICD_POLICIES: 'ShiftLeft-Demo-Misconfigurations-Example,ShiftLeft-Demo-Secrets'
-      OUTPUT_FILE: 'wiz-iac-scan-results.json'
 
     steps:
     # This action checks-out your repository, so third-party tools can access it.
@@ -66,3 +64,4 @@ jobs:
       with:
         sarif_file: ${OUTPUT_FILE}
       continue-on-error: true
+      if: always()

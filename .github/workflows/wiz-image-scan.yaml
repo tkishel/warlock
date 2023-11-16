@@ -31,17 +31,13 @@ jobs:
           images:
             - 'images/**'
 
-  wiz-image-scan-detail:
-    name: 'WizCLI Image Scan Detail'
+  wiz-image-scan-images:
+    name: 'WizCLI Image Scan Images'
     needs: wiz-image-scan
     if: ${{ needs.wiz-image-scan.outputs.images == 'true' }}
-    defaults:
-      run:
-        shell: bash
-    runs-on: ubuntu-latest
     env:
       SCAN_PATH: 'images'
-      # Optionally modify this to match your demo use case.
+      # Optionally modify 'CICD_POLICIES' to match your demo use case.
       # For example, to Audit rather than Block:
       # CICD_POLICIES: 'SL-Demo-Secrets,SL-Demo-Vulnerabilities'
       CICD_POLICIES: 'ShiftLeft-Demo-Secrets-Block,ShiftLeft-Demo-Vulnerabilities-Block'
@@ -51,6 +47,11 @@ jobs:
       # Optional. Requires configuration in Docker Hub (or another registry) to demo "wizcli docker tag".
       # https://github.com/marketplace/actions/docker-login
       ENABLE_WIZ_DOCKER_TAG: 'false'
+
+    defaults:
+      run:
+        shell: bash
+    runs-on: ubuntu-latest
 
     steps:
     # This action checks-out your repository, so third-party tools can access it.
@@ -96,3 +97,4 @@ jobs:
       with:
         sarif_file: ${OUTPUT_FILE}
       continue-on-error: true
+      if: always()
