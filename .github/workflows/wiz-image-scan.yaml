@@ -14,12 +14,26 @@ on:
   pull_request:
     branches: 
     - main
-    paths:
-    - 'images/Dockerfile'
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      images: ${{ steps.filter.outputs.images }}
+    steps:
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          images:
+            - 'images/**'
+
   wiz-image-scan:
     name: 'WizCLI Image Scan'
+    needs: changes
+    if: ${{ needs.changes.outputs.images == 'true' }}
     defaults:
       run:
         shell: bash
