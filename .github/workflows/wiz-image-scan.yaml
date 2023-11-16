@@ -14,8 +14,6 @@ on:
   pull_request:
     branches: 
     - main
-    # Modify this to match your demo use case. For example:
-    # To scan all Dockerfiles, change to: - 'images/**'
     paths:
     - 'images/Dockerfile'
 
@@ -28,13 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SCAN_PATH: 'images'
-      # Modify this to match your demo use case. For example, to Audit rather than Block:
+      # Optionally modify this to match your demo use case.
+      # For example, to Audit rather than Block:
       # CICD_POLICIES: 'SL-Demo-Secrets,SL-Demo-Vulnerabilities'
-      CICD_POLICIES: 'SL-Demo-Secrets-Block,SL-Demo-Vulnerabilities-Block'
+      CICD_POLICIES: 'ShiftLeft-Demo-Secrets-Block,ShiftLeft-Demo-Vulnerabilities-Block'
       OUTPUT_FILE: 'wiz-image-scan-results.json'
       IMAGE: 'wizard/wiz-example-image'
       TAG: ${{ github.run_number }}
-      # Requires configuration in Docker Hub (or another registry) to demo "wizcli docker tag".
+      # Optional. Requires configuration in Docker Hub (or another registry) to demo "wizcli docker tag".
       # https://github.com/marketplace/actions/docker-login
       ENABLE_WIZ_DOCKER_TAG: 'false'
 
