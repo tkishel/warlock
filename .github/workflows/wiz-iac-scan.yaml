@@ -62,6 +62,6 @@ jobs:
     # This action uploads SARIF files to your repository, so you can see code scanning alerts from third-party tools.
     - uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: ${OUTPUT_FILE}
+        sarif_file: ${{ env.OUTPUT_FILE }}
       continue-on-error: true
       if: always()
