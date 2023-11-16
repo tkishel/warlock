@@ -16,7 +16,8 @@ on:
     - main
 
 jobs:
-  changes:
+  wiz-image-scan:
+    name: 'WizCLI Image Scan'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
@@ -30,10 +31,10 @@ jobs:
           images:
             - 'images/**'
 
-  wiz-image-scan:
-    name: 'WizCLI Image Scan'
-    needs: changes
-    if: ${{ needs.changes.outputs.images == 'true' }}
+  wiz-image-scan-detail:
+    name: 'WizCLI Image Scan Detail'
+    needs: wiz-image-scan
+    if: ${{ needs.wiz-image-scan.outputs.images == 'true' }}
     defaults:
       run:
         shell: bash
