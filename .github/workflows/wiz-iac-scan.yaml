@@ -1,5 +1,12 @@
-# See also: https://docs.wiz.io/wiz-docs/docs/github-pipeline
-# For personal use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
+# Requires credentials for a Wiz Service Account to authenticate to Wiz. 
+# For your demo use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
+# Reference: https://docs.wiz.io/wiz-docs/docs/service-accounts-settings
+#
+# Wiz Service Account permissions: create:security_scans.
+# Reference: https://docs.wiz.io/wiz-docs/docs/github-pipeline
+#
+# Store CLIENT_ID as secrets.WIZ_CLIENT_ID and SECRET as secrets.WIZ_CLIENT_SECRET
+# Reference: https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
 
 name: 'wiz-iac-scan'
 
@@ -7,6 +14,11 @@ on:
   pull_request:
     branches: 
     - main
+    # Modify this to match your demo use case. For example:
+    # To scan all resources, change to:     - 'terraform/**'
+    # To scan all AWS resources, change to: - 'terraform/aws/**'
+    paths:
+    - 'terraform/aws/example.tf'
 
 jobs:
   wiz-iac-scan:
@@ -16,10 +28,11 @@ jobs:
         shell: bash
     runs-on: ubuntu-latest
     env:
-      SCAN_PATH: "terraform"
-      # CICD_POLICIES: "SL-Demo-Misconfigurations,SL-Demo-Secrets"
-      CICD_POLICIES: "SL-Demo-Misconfigurations-Block,SL-Demo-Secrets-Block"
-      OUTPUT_FILE: "wiz-iac-scan-results.json"
+      SCAN_PATH: 'terraform'
+      # Modify this to match your demo use case. For example, to Audit rather than Block:
+      # CICD_POLICIES: 'SL-Demo-Misconfigurations,SL-Demo-Secrets'
+      CICD_POLICIES: 'SL-Demo-Misconfigurations-Block,SL-Demo-Secrets-Block'
+      OUTPUT_FILE: 'wiz-iac-scan-results.json'
 
     steps:
     # This action checks-out your repository, so third-party tools can access it.

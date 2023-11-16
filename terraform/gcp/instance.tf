@@ -1,12 +1,9 @@
 # Terraform Registry Example
+#
+# https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance
 
-resource "google_service_account" "example_service_account" {
-  account_id   = "example-service-account"
-  display_name = "Example Service Account for VM Instance"
-}
-
-resource "google_compute_instance" "gcp_example_instance" {
-  name         = "gcp_example_instance"
+resource "google_compute_instance" "example_compute_instance" {
+  name         = "example-compute-instance"
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"
@@ -16,7 +13,6 @@ resource "google_compute_instance" "gcp_example_instance" {
     }
   }
   machine_type = "n2-standard-2"
-  metadata_startup_script = "echo '{secret: secret}' > /etc/secret.json"
   network_interface {
     network = "default"
     access_config {}
@@ -31,4 +27,7 @@ resource "google_compute_instance" "gcp_example_instance" {
   zone         = "us-west2-a"
 }
 
-
+resource "google_service_account" "example_service_account" {
+  account_id   = "example-service-account"
+  display_name = "Example Service Account for VM Instance"
+}

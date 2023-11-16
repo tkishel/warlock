@@ -1,6 +1,8 @@
 # Terraform Registry Example
+#
+# https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket
 
-resource "google_storage_bucket" "gcp_example_bucket" {
+resource "google_storage_bucket" "example_storage_bucket" {
   name          = "www.example.com"
   cors {
     origin          = ["http://www.example.com"]
