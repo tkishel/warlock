@@ -18,7 +18,7 @@ jobs:
     env:
       SCAN_PATH: "terraform"
       # CICD_POLICIES: "SL-Demo-Misconfigurations,SL-Demo-Secrets"
-      CICD_POLICIES: "SL-Demo-Misconfigurations-Block,SL-Demo-Secrets-Block"
+      CICD_POLICIES: "s3-bucket-versioning"
       OUTPUT_FILE: "wiz-iac-scan-results.json"
 
     steps:
