@@ -1,5 +1,8 @@
-# Minimal Default
+resource "aws_s3_bucket" "wiz" {
+  bucket = "my-tf-test-bucket"
+  acl    = "private"
 
-resource "aws_s3_bucket" "aws_example_bucket" {
-  bucket = "aws_example_bucket"
+  versioning {
+    enabled = true
+  }
 }
