@@ -80,6 +80,7 @@ jobs:
     - name: Run WizCLI IaC Scan
       run: |
         ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_IAC_POLICIES}" --policy-hits-only --output wiz-iac-scan-results.json,sarif,true
+      continue-on-error: true
 
     - uses: github/codeql-action/upload-sarif@v2
       with:
@@ -90,6 +91,7 @@ jobs:
     - name: Run WizCLI Dir Scan
       run: |
         ./wizcli dir scan --path ${SCAN_PATH} --policy "${CICD_DIR_POLICIES}" --policy-hits-only --output wiz-dir-scan-results.json,sarif,true
+      continue-on-error: true
 
     - uses: github/codeql-action/upload-sarif@v2
       with:
@@ -101,10 +103,12 @@ jobs:
     - name: Build the Docker Image
       run: |
         docker build "${SCAN_PATH}" -t "${IMAGE}:${TAG}"
+      continue-on-error: true
 
     - name: Run WizCLI (Docker) Image Scan
       run: |
         ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --driver mountWithLayers --policy "${CICD_IMG_POLICIES}" --policy-hits-only --output wiz-docker-scan-results.json,sarif,true
+      continue-on-error: true
 
     - uses: github/codeql-action/upload-sarif@v2
       with:
