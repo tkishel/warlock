@@ -29,7 +29,7 @@ jobs:
       with:
         filters: |
           images:
-            - 'images'
+            - 'images/**'
 
   wiz-image-scan-images:
     name: 'WizCLI Image Scan Images'
