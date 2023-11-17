@@ -77,6 +77,10 @@ jobs:
         WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
         WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
 
+    - name: Build the Docker Image
+      run: |
+        docker build "${SCAN_PATH}" -t "${IMAGE}:${TAG}"
+
     - name: Run WizCLI IaC Scan
       run: |
         ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_IAC_POLICIES}" --policy-hits-only --output wiz-iac-scan-results.json,sarif,true
@@ -100,11 +104,6 @@ jobs:
       continue-on-error: true
       if: always()
 
-    - name: Build the Docker Image
-      run: |
-        docker build "${SCAN_PATH}" -t "${IMAGE}:${TAG}"
-      continue-on-error: true
-
     - name: Run WizCLI (Docker) Image Scan
       run: |
         ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --driver mountWithLayers --policy "${CICD_IMG_POLICIES}" --policy-hits-only --output wiz-docker-scan-results.json,sarif,true
@@ -116,6 +115,7 @@ jobs:
         sarif_file: wiz-docker-scan-results.json
       continue-on-error: true
       if: always()
+
 
     - name: Push Docker Image
       if: ${{ env.ENABLE_WIZ_DOCKER_TAG == 'true' }}
