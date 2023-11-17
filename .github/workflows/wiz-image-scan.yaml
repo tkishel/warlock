@@ -1,4 +1,4 @@
-# Requires credentials for a Wiz Service Account to authenticate to Wiz. 
+# Requires credentials for a Wiz Service Account to authenticate to Wiz.
 # For your demo use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
 # Reference: https://docs.wiz.io/wiz-docs/docs/service-accounts-settings
 #
@@ -10,9 +10,9 @@
 
 name: 'wiz-image-scan'
 
-on: 
+on:
   pull_request:
-    branches: 
+    branches:
     - main
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
       with:
         filters: |
           images:
-            - 'images/**'
+            - 'images'
 
   wiz-image-scan-images:
     name: 'WizCLI Image Scan Images'
@@ -37,11 +37,13 @@ jobs:
     if: ${{ needs.wiz-image-scan.outputs.images == 'true' }}
     env:
       SCAN_PATH: 'images'
-      # Optionally modify 'CICD_POLICIES' to match your demo use case.
-      # For example, to Audit rather than Block:
-      # CICD_POLICIES: 'SL-Demo-Secrets,SL-Demo-Vulnerabilities'
-      CICD_POLICIES: 'ShiftLeft-Demo-Secrets-Block,ShiftLeft-Demo-Vulnerabilities-Block'
-      OUTPUT_FILE: 'wiz-image-scan-results.json'
+      # Optionally modify policies to match your demo use case (Audit or Block).
+      # CICD_IAC_POLICIES: 'ShiftLeft-Demo-Audit-Misconfigurations,ShiftLeft-Demo-Audit-Secrets'
+      # CICD_IAC_POLICIES: 'ShiftLeft-Demo-Audit-Misconfigurations,ShiftLeft-Demo-Audit-Secrets'
+      # CICD_IMG_POLICIES: 'ShiftLeft-Demo-Audit-Misconfigurations,ShiftLeft-Demo-Audit-Secrets'
+      CICD_IAC_POLICIES: 'ShiftLeft-Demo-Block-Misconfigurations,ShiftLeft-Demo-Block-Secrets'
+      CICD_DIR_POLICIES: 'ShiftLeft-Demo-Block-Secrets,ShiftLeft-Demo-Block-Vulnerabilities'
+      CICD_IMG_POLICIES: 'ShiftLeft-Demo-Block-Secrets,ShiftLeft-Demo-Block-Vulnerabilities'
       IMAGE: 'wizard/wiz-example-image'
       TAG: ${{ github.run_number }}
       # Optional. Requires configuration in Docker Hub (or another registry) to demo "wizcli docker tag".
@@ -54,7 +56,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # This action checks-out your repository, so third-party tools can access it.
     - name: Checkout Repository
       uses: actions/checkout@v4
 
@@ -65,11 +66,9 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build the Docker Image
-      run: docker build "${SCAN_PATH}" -t "${IMAGE}:${TAG}"
-
     - name: Download WizCLI
-      run: curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
+      run: |
+        curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
 
     - name: Authenticate to Wiz
       run: ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
@@ -78,12 +77,46 @@ jobs:
         WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
         WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
 
+    - name: Run WizCLI IaC Scan
+      run: |
+        ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_IAC_POLICIES}" --policy-hits-only --output wiz-iac-scan-results.json,sarif,true
+
+    - uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: wiz-iac-scan-results.json
+      continue-on-error: true
+      if: always()
+
+    - name: Run WizCLI Dir Scan
+      run: |
+        ./wizcli dir scan --path ${SCAN_PATH} --policy "${CICD_DIR_POLICIES}" --policy-hits-only --output wiz-dir-scan-results.json,sarif,true
+
+    - uses: github/codeql-action/upload-sarif@v2
+      with:
+        category: directory-scans
+        sarif_file: wiz-dir-scan-results.json
+      continue-on-error: true
+      if: always()
+
+    - name: Build the Docker Image
+      run: |
+        docker build "${SCAN_PATH}" -t "${IMAGE}:${TAG}"
+
     - name: Run WizCLI (Docker) Image Scan
-      run: ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --driver mountWithLayers --policy "${CICD_POLICIES}" --policy-hits-only --output "${OUTPUT_FILE}",sarif,true
+      run: |
+        ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --driver mountWithLayers --policy "${CICD_IMG_POLICIES}" --policy-hits-only --output wiz-docker-scan-results.json,sarif,true
+
+    - uses: github/codeql-action/upload-sarif@v2
+      with:
+        category: docker-scans
+        sarif_file: wiz-docker-scan-results.json
+      continue-on-error: true
+      if: always()
 
     - name: Push Docker Image
       if: ${{ env.ENABLE_WIZ_DOCKER_TAG == 'true' }}
-      run: docker push "${IMAGE}:${TAG}"
+      run: |
+        docker push "${IMAGE}:${TAG}"
 
     - name: WizCLI Docker Tag
       if: ${{ env.ENABLE_WIZ_DOCKER_TAG == 'true' }}
@@ -92,9 +125,4 @@ jobs:
         docker images --digests
         ./wizcli docker tag --image "${IMAGE}:${TAG}"
 
-    # This action uploads SARIF files, so you can see code scanning alerts from third-party tools in your repository.
-    - uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: ${OUTPUT_FILE}
-      continue-on-error: true
-      if: always()
+

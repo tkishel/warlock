@@ -1,4 +1,4 @@
-# Requires credentials for a Wiz Service Account to authenticate to Wiz. 
+# Requires credentials for a Wiz Service Account to authenticate to Wiz.
 # For your demo use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
 # Reference: https://docs.wiz.io/wiz-docs/docs/service-accounts-settings
 #
@@ -10,14 +10,14 @@
 
 name: 'wiz-iac-scan'
 
-on: 
+on:
   pull_request:
-    branches: 
+    branches:
     - main
-    # Optionally modify 'paths' to match your demo use case.
+    paths:
+    # Optionally modify paths to match your demo use case.
     # For example: to trigger this action on changes to all terraform files, use:
     # - 'terraform/**'
-    paths:
     - 'terraform/aws/example.tf'
 
 jobs:
@@ -26,13 +26,13 @@ jobs:
     env:
       # Optionally modify 'SCAN_PATH' to match your demo use case.
       # For example: to scan all terraform files:
+      #
       # SCAN_PATH: 'terraform'
       SCAN_PATH: 'terraform/aws/example.tf'
-      # Optionally modify 'CICD_POLICIES' to match your demo use case.
-      # For example, to check for all Misconfigurations and Audit all rather than Block:
-      # CICD_POLICIES: 'ShiftLeft-Demo-Misconfigurations,ShiftLeft-Demo-Secrets'
-      CICD_POLICIES: 'ShiftLeft-Demo-Misconfigurations-Example,ShiftLeft-Demo-Secrets-Block'
-      OUTPUT_FILE: 'wiz-iac-scan-results.json'
+      # Optionally modify policies to match your demo use case (Audit or Block).
+      # CICD_IAC_POLICIES: 'ShiftLeft-Demo-Audit-Misconfigurations,ShiftLeft-Demo-Audit-Secrets'
+      # CICD_IAC_POLICIES: 'ShiftLeft-Demo-Block-Misconfigurations,ShiftLeft-Demo-Block-Secrets'
+      CICD_IAC_POLICIES: 'ShiftLeft-Demo-Block-Misconfigurations-Example,ShiftLeft-Demo-Block-Secrets'
 
     defaults:
       run:
@@ -40,28 +40,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # This action checks-out your repository, so third-party tools can access it.
     - name: Checkout Repository
       uses: actions/checkout@v4
 
     - name: Download WizCLI
-      run: curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
+      run: |
+        curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
 
     - name: Authenticate to Wiz
-      # Credentials for a Wiz Service Account (CLIENT ID and SECRET) is required to authenticate to Wiz.
-      # Wiz Service Account permissions: create:security_scans.
-      run: ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
-      # Secrets allow you to store sensitive information (credentials) in your organization, repository, or repository environments.
+      run: |
+        ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
       env:
         WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
         WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
 
-    - name: Run WizCLI IaC Scan 
-      run: ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_POLICIES}" --policy-hits-only --output "${OUTPUT_FILE}",sarif,true
+    - name: Run WizCLI IaC Scan
+      run: |
+        ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_IAC_POLICIES}" --policy-hits-only --output wiz-iac-scan-results.json,sarif,true
 
-    # This action uploads SARIF files to your repository, so you can see code scanning alerts from third-party tools.
     - uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: ${{ env.OUTPUT_FILE }}
+        sarif_file: wiz-iac-scan-results.json
       continue-on-error: true
       if: always()
