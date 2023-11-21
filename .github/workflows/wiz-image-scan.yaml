@@ -66,7 +66,6 @@ jobs:
 
     - name: Authenticate to Wiz
       run: ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
-      # Secrets allow you to store sensitive information (credentials) in your organization, repository, or repository environments.
       env:
         WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
         WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
@@ -84,7 +83,7 @@ jobs:
       with:
         sarif_file: wiz-iac-scan-results.json
       continue-on-error: true
-      if: always()
+      if: ${{ github.event_name == 'pull_request' && ( success() || failure() )}}
 
     - name: Run WizCLI Dir Scan
       run: |
@@ -96,7 +95,7 @@ jobs:
         category: directory-scans
         sarif_file: wiz-dir-scan-results.json
       continue-on-error: true
-      if: always()
+      if: ${{ github.event_name == 'pull_request' && ( success() || failure() )}}
 
     - name: Run WizCLI (Docker) Image Scan
       run: |
@@ -108,7 +107,7 @@ jobs:
         category: docker-scans
         sarif_file: wiz-docker-scan-results.json
       continue-on-error: true
-      if: always()
+      if: ${{ github.event_name == 'pull_request' && ( success() || failure() )}}
 
     - name: Push Docker Image
       if: ${{ secrets.REGISTRY_USER != '' }}

@@ -48,9 +48,3 @@ jobs:
     - name: Run WizCLI IaC Scan
       run: |
         ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_IAC_POLICIES}" --policy-hits-only --output wiz-iac-scan-results.json,sarif,true
-
-    - uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: wiz-iac-scan-results.json
-      continue-on-error: true
-      if: ${{ github.event_name == 'pull_request' && ( success() || failure() )}}
