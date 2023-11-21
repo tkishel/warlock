@@ -15,34 +15,14 @@ on:
     branches:
     - main
     paths:
-    # Optionally modify paths to match your demo use case.
-    #
-    # For example: to trigger this action on changes to all terraform files, use:
-    # - 'terraform/**'
     - 'terraform/aws/example.tf'
+  workflow_dispatch:
 
 jobs:
   wiz-iac-scan:
     name: 'WizCLI IaC Scan'
     env:
-      # Optionally modify 'SCAN_PATH' to match your demo use case.
-      #
-      # For example: to scan all terraform files:
-      #
-      # SCAN_PATH: 'terraform'
       SCAN_PATH: 'terraform/aws/example.tf'
-      # Optionally modify policies to match your demo use case.
-      #
-      # Audit:
-      #
-      #   CICD_IAC_POLICIES: 'ShiftLeft-Demo-Audit-Misconfigurations,ShiftLeft-Demo-Audit-Secrets'
-      #
-      # Block:
-      #
-      #   CICD_IAC_POLICIES: 'ShiftLeft-Demo-Block-Misconfigurations,ShiftLeft-Demo-Block-Secrets'
-      #
-      # Block, with Misconfigurations limited to one Cloud Configuration Rule:
-      #
       CICD_IAC_POLICIES: 'ShiftLeft-Demo-Block-Misconfigurations-Example,ShiftLeft-Demo-Block-Secrets'
 
     defaults:

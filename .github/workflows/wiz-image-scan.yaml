@@ -14,6 +14,7 @@ on:
   pull_request:
     branches:
     - main
+  workflow_dispatch:
 
 jobs:
   wiz-image-scan:
@@ -37,15 +38,6 @@ jobs:
     if: ${{ needs.wiz-image-scan.outputs.images == 'true' }}
     env:
       SCAN_PATH: 'images'
-      # Optionally modify policies to match your demo use case.
-      #
-      # Audit:
-      # CICD_IAC_POLICIES: 'ShiftLeft-Demo-Audit-Misconfigurations,ShiftLeft-Demo-Audit-Secrets'
-      # CICD_IAC_POLICIES: 'ShiftLeft-Demo-Audit-Secrets,ShiftLeft-Demo-Audit-Vulnerabilities'
-      # CICD_IMG_POLICIES: 'ShiftLeft-Demo-Audit-Secrets,ShiftLeft-Demo-Audit-Vulnerabilities'
-      #
-      # Block:
-      #
       CICD_IAC_POLICIES: 'ShiftLeft-Demo-Block-Misconfigurations,ShiftLeft-Demo-Block-Secrets'
       CICD_DIR_POLICIES: 'ShiftLeft-Demo-Block-Secrets,ShiftLeft-Demo-Block-Vulnerabilities'
       CICD_IMG_POLICIES: 'ShiftLeft-Demo-Block-Secrets,ShiftLeft-Demo-Block-Vulnerabilities'
