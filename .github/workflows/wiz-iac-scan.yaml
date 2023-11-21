@@ -53,4 +53,4 @@ jobs:
       with:
         sarif_file: wiz-iac-scan-results.json
       continue-on-error: true
-      if: always()
+      if: ${{ github.event_name == 'pull_request' && ( success() || failure() )}}
