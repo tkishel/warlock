@@ -37,12 +37,22 @@ jobs:
       run: |
         curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
 
-    - name: Authenticate to Wiz
+    - name: Authenticate to Wiz Demo Tenant
+      run: |
+        ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
+      env:
+        WIZ_ENV: 'demo'
+        WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID_DEMO }}
+        WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET_DEMO }}
+      if: ${{ startsWith(github.event.pull_request.head.ref, 'wiz_demo_env') }}
+
+    - name: Authenticate to Wiz Main Tenant
       run: |
         ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
       env:
         WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID }}
         WIZ_CLIENT_SECRET: ${{ secrets.WIZ_CLIENT_SECRET }}
+      if: ${{ !startsWith(github.event.pull_request.head.ref, 'wiz_demo_env') }}
 
     - name: Run WizCLI IaC Scan
       run: |
