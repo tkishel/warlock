@@ -1,19 +1,15 @@
-# ShiftLeft Wiz SE Demo Repository
+# Wiz ShiftLeft Demo Repository
 
 WizCLI helps shift security policies left by empowering DevOps to prevent insecure resources from being deployed.
 
 ## Description
 
-This repository supports demonstrating the ShiftLeft functionality of Wiz.
+This repository supports demonstrating ShiftLeft features of Wiz.
 
 ## Configuration
 
-Configure a copy of this repository:
-
 * Create a [Wiz Service Account](https://docs.wiz.io/wiz-docs/docs/service-accounts-settings) with `create:security_scans` permissions
-    * (Note: do not create the Wiz Service Account in the Demo tenant)
 * Use this template to copy this repository into your own GitHub namespace
-    * (Note: do not create the copy in the `Wiz-Sec` GitHub namespace)
 * Create `WIZ_CLIENT_ID` and `WIZ_CLIENT_SECRET` [secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions) in your repository
 * Configure Branch Protection for the `main` branch
     * Navigate to `Settings > Code and Automation > Branches`

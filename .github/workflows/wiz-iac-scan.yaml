@@ -1,5 +1,4 @@
 # Requires credentials for a Wiz Service Account to authenticate to Wiz.
-# For your demo use, specify a Wiz Service Account and CI/CD Policies in CSA-Prod.
 # Reference: https://docs.wiz.io/wiz-docs/docs/service-accounts-settings
 #
 # Wiz Service Account permissions: create:security_scans.
