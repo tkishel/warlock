@@ -39,7 +39,6 @@ jobs:
     env:
       SCAN_PATH: 'container'
       CICD_IAC_POLICIES: 'SecCloudDev-Demo-Block-Misconfigurations,SecCloudDev-Demo-Block-Secrets'
-      CICD_DIR_POLICIES: 'SecCloudDev-Demo-Block-Secrets,SecCloudDev-Demo-Block-Vulnerabilities'
       CICD_IMG_POLICIES: 'SecCloudDev-Demo-Block-Secrets,SecCloudDev-Demo-Block-Vulnerabilities'
       IMAGE: 'wizard/wiz-example-image'
       TAG: ${{ github.run_number }}
@@ -87,7 +86,7 @@ jobs:
 
     - name: Run WizCLI Dir Scan
       run: |
-        ./wizcli dir scan --path ${SCAN_PATH} --policy "${CICD_DIR_POLICIES}" --policy-hits-only --output wiz-dir-scan-results.json,sarif,true
+        ./wizcli dir scan --path ${SCAN_PATH} --policy "${CICD_IMG_POLICIES}" --policy-hits-only --output wiz-dir-scan-results.json,sarif,true
       continue-on-error: true
 
     - uses: github/codeql-action/upload-sarif@v2
