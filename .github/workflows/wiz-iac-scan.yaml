@@ -39,11 +39,12 @@ jobs:
 
     - name: Set Wiz Environment
       run: |
-        echo "WIZ_ENV=demo" >> ${GITHUB_ENV}
+        echo "WIZ_ENV=demo" >> $GITHUB_ENV
       if: ${{ startsWith(github.event.pull_request.head.ref, 'wiz_demo_env') }}
 
     - name: Optionally Authenticate to Wiz Demo Tenant
       run: |
+        env
         ./wizcli auth --id "${WIZ_CLIENT_ID}" --secret "${WIZ_CLIENT_SECRET}"
       env:
         WIZ_CLIENT_ID: ${{ secrets.WIZ_CLIENT_ID_DEMO }}
