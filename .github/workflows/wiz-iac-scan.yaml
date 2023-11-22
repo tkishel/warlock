@@ -22,7 +22,7 @@ jobs:
     name: 'WizCLI IaC Scan'
     env:
       SCAN_PATH: 'terraform/aws/example.tf'
-      CICD_IAC_POLICIES: 'ShiftLeft-Demo-Block-Misconfigurations-Example,ShiftLeft-Demo-Block-Secrets'
+      CICD_IAC_POLICIES: 'SecCloudDev-Demo-Block-s3-Example,SecCloudDev-Demo-Block-Secrets'
 
     defaults:
       run:

@@ -1,22 +1,24 @@
-# Wiz ShiftLeft Demo Repository
+# Wiz Secure Cloud Development Demo Repository
 
 WizCLI helps shift security policies left by empowering DevOps to prevent insecure resources from being deployed.
 
 ## Description
 
-This repository supports demonstrating ShiftLeft features of Wiz.
+This repository supports demonstrating Secure Cloud Development features of Wiz.
 
 ## Configuration
 
-* Create a [Wiz Service Account](https://docs.wiz.io/wiz-docs/docs/service-accounts-settings) with `create:security_scans` permissions
+* Create a [Wiz Service Account](https://docs.wiz.io/wiz-docs/docs/service-accounts-settings) with `create:security_scans` and `update:security_scans` permissions
 * Use this template to copy this repository into your own GitHub namespace
 * Create `WIZ_CLIENT_ID` and `WIZ_CLIENT_SECRET` [secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions) in your repository
+* Run the `WizCLI IaC Scan` GitHub Action once to register it for use in Branch Protection.
+    * Navigate to `Actions > wiz-iac-scan`
+    * Select `Run Workflow`
 * Configure Branch Protection for the `main` branch
     * Navigate to `Settings > Code and Automation > Branches`
     * Check `Require a pull request before merging`
     * Check `Require status checks to pass before merging`
     * Search for and select the `WizCLI IaC Scan` GitHub Action
-        * (Note: you may have to trigger the `WizCLI IaC Scan` GitHub Action once to select it)
     * Save Changes
 
 ## Usage
@@ -39,5 +41,5 @@ To enable them, edit the [WizCLI IaC Scan](.github/workflows/wiz-iac-scan.yaml) 
 This repository includes a Docker Image example.
 To enable that, add the [WizCLI Image Scan](.github/workflows/wiz-image-scan.yaml) GitHub Action to your Branch Protection Status Checks.
 
-This repository depends upon the [ShiftLeft-Demo](https://app.wiz.io/policies/cicd-policies#~(filters~(search~(contains~'ShiftLeft-Demo)))) CI/CD & Admission Policies
-and the [ShiftLeft Demo Framework for S3](https://app.wiz.io/settings/security-frameworks#~(filters~(search~(contains~'A*20ShiftLeft*20Demo*20Framework*20for*20S3)))) Compliance Framework.
+This repository depends upon the [SecCloudDev-Demo](https://app.wiz.io/policies/cicd-policies#~(filters~(search~(contains~'SecCloudDev-Demo)))) CI/CD Policies
+and the [SecCloudDev Demo for S3](https://app.wiz.io/settings/security-frameworks#~(filters~(search~(contains~'SecCloudDev*20Demo)))) Compliance Framework.

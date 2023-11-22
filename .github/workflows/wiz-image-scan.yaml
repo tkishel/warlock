@@ -23,24 +23,24 @@ jobs:
     permissions:
       pull-requests: read
     outputs:
-      images: ${{ steps.filter.outputs.images }}
+      container: ${{ steps.filter.outputs.container }}
     steps:
     - uses: dorny/paths-filter@v2
       id: filter
       with:
         filters: |
-          images:
-            - 'images/**'
+          container:
+            - 'container/**'
 
-  wiz-image-scan-images:
-    name: 'WizCLI Image Scan Images'
+  wiz-image-scan-container:
+    name: 'WizCLI Image Scan Container'
     needs: wiz-image-scan
-    if: ${{ needs.wiz-image-scan.outputs.images == 'true' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.wiz-image-scan.outputs.container == 'true' }}
     env:
-      SCAN_PATH: 'images'
-      CICD_IAC_POLICIES: 'ShiftLeft-Demo-Block-Misconfigurations,ShiftLeft-Demo-Block-Secrets'
-      CICD_DIR_POLICIES: 'ShiftLeft-Demo-Block-Secrets,ShiftLeft-Demo-Block-Vulnerabilities'
-      CICD_IMG_POLICIES: 'ShiftLeft-Demo-Block-Secrets,ShiftLeft-Demo-Block-Vulnerabilities'
+      SCAN_PATH: 'container'
+      CICD_IAC_POLICIES: 'SecCloudDev-Demo-Block-Misconfigurations,SecCloudDev-Demo-Block-Secrets'
+      CICD_DIR_POLICIES: 'SecCloudDev-Demo-Block-Secrets,SecCloudDev-Demo-Block-Vulnerabilities'
+      CICD_IMG_POLICIES: 'SecCloudDev-Demo-Block-Secrets,SecCloudDev-Demo-Block-Vulnerabilities'
       IMAGE: 'wizard/wiz-example-image'
       TAG: ${{ github.run_number }}
 
@@ -83,7 +83,7 @@ jobs:
       with:
         sarif_file: wiz-iac-scan-results.json
       continue-on-error: true
-      if: ${{ github.event_name == 'pull_request' && ( success() || failure() )}}
+      if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
 
     - name: Run WizCLI Dir Scan
       run: |
@@ -95,19 +95,19 @@ jobs:
         category: directory-scans
         sarif_file: wiz-dir-scan-results.json
       continue-on-error: true
-      if: ${{ github.event_name == 'pull_request' && ( success() || failure() )}}
+      if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
 
-    - name: Run WizCLI (Docker) Image Scan
+    - name: Run WizCLI Docker Scan
       run: |
-        ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --policy "${CICD_IMG_POLICIES}" --policy-hits-only --output wiz-docker-scan-results.json,sarif,true
+        ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --policy "${CICD_IMG_POLICIES}" --policy-hits-only --output wiz-image-scan-results.json,sarif,true
       continue-on-error: true
 
     - uses: github/codeql-action/upload-sarif@v2
       with:
         category: docker-scans
-        sarif_file: wiz-docker-scan-results.json
+        sarif_file: wiz-image-scan-results.json
       continue-on-error: true
-      if: ${{ github.event_name == 'pull_request' && ( success() || failure() )}}
+      if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
 
     - name: Push Docker Image
       if: ${{ secrets.REGISTRY_USER != '' }}
@@ -117,6 +117,6 @@ jobs:
     - name: WizCLI Docker Tag
       if: ${{ secrets.REGISTRY_USER != '' }}
       run: |
-        docker images list && docker images --digests && ./wizcli docker tag --image "${IMAGE}:${TAG}"
-
-
+        docker images list
+        docker images --digests
+        ./wizcli docker tag --image "${IMAGE}:${TAG}"
