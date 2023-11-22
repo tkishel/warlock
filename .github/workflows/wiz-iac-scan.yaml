@@ -1,4 +1,4 @@
-o # Requires credentials for a Wiz Service Account to authenticate to Wiz.
+# Requires credentials for a Wiz Service Account to authenticate to Wiz.
 # Reference: https://docs.wiz.io/wiz-docs/docs/service-accounts-settings
 #
 # Wiz Service Account permissions: create:security_scans.
