@@ -35,11 +35,6 @@ jobs:
 
     - name: Download WizCLI
       run: |
-        echo
-        env
-        echo
-        echo "TJK ${{ vars.WIZ_DIR }}"
-        echo
         curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
 
     - name: Authenticate to Wiz
