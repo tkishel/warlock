@@ -1,4 +1,4 @@
-LABEL example=image
+# Example
 
 FROM ubuntu:18.04
 
