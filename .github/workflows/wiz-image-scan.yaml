@@ -52,12 +52,12 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Login to a Docker Registry
-      if: ${{ secrets.REGISTRY_USER != '' }}
-      uses: docker/login-action@v3.0.0
-      with:
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_PASS }}
+    #- name: Login to a Docker Registry
+    #  if: ${{ secrets.REGISTRY_USER != '' }}
+    #  uses: docker/login-action@v3.0.0
+    #  with:
+    #    username: ${{ secrets.REGISTRY_USER }}
+    #    password: ${{ secrets.REGISTRY_PASS }}
 
     - name: Download WizCLI
       run: |
@@ -108,14 +108,14 @@ jobs:
       continue-on-error: true
       if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
 
-    - name: Push Docker Image
-      if: ${{ secrets.REGISTRY_USER != '' }}
-      run: |
-        docker push "${IMAGE}:${TAG}"
+    #- name: Push Docker Image
+    #  if: ${{ secrets.REGISTRY_USER != '' }}
+    #  run: |
+    #    docker push "${IMAGE}:${TAG}"
 
-    - name: WizCLI Docker Tag
-      if: ${{ secrets.REGISTRY_USER != '' }}
-      run: |
-        docker images list
-        docker images --digests
-        ./wizcli docker tag --image "${IMAGE}:${TAG}"
+    #- name: WizCLI Docker Tag
+    #  if: ${{ secrets.REGISTRY_USER != '' }}
+    #  run: |
+    #    docker images list
+    #    docker images --digests
+    #    ./wizcli docker tag --image "${IMAGE}:${TAG}"
