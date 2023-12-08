@@ -4,4 +4,8 @@
 
 resource "aws_s3_bucket" "aws_example_bucket" {
   bucket = "aws-example-bucket"
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
 }
