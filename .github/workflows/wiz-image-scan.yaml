@@ -10,30 +10,11 @@
 
 name: 'wiz-image-scan'
 
-on:
-  pull_request:
-    branches:
-    - main
-  workflow_dispatch:
+on: [pull_request]
 
 jobs:
-  wiz-image-scan:
-    name: 'WizCLI Image Scan'
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
-    outputs:
-      container: ${{ steps.filter.outputs.container }}
-    steps:
-    - uses: dorny/paths-filter@v2
-      id: filter
-      with:
-        filters: |
-          container:
-            - 'container/**'
-
   wiz-image-scan-container:
-    name: 'WizCLI Image Scan Container'
+    name: 'WizCLI Image Scan'
     needs: wiz-image-scan
     if: ${{ github.event_name == 'workflow_dispatch' || needs.wiz-image-scan.outputs.container == 'true' }}
     env:
@@ -52,13 +33,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    #- name: Login to a Docker Registry
-    #  if: ${{ secrets.REGISTRY_USER != '' }}
-    #  uses: docker/login-action@v3.0.0
-    #  with:
-    #    username: ${{ secrets.REGISTRY_USER }}
-    #    password: ${{ secrets.REGISTRY_PASS }}
-
     - name: Download WizCLI
       run: |
         curl -o wizcli https://wizcli.app.wiz.io/latest/wizcli && chmod +x wizcli
@@ -73,49 +47,6 @@ jobs:
       run: |
         docker build "${SCAN_PATH}" -t "${IMAGE}:${TAG}"
 
-    - name: Run WizCLI IaC Scan
-      run: |
-        ./wizcli iac scan --path "${SCAN_PATH}" --policy "${CICD_IAC_POLICIES}" --policy-hits-only --output wiz-iac-scan-results.json,sarif,true
-      continue-on-error: true
-
-    - uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: wiz-iac-scan-results.json
-      continue-on-error: true
-      if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
-
-    - name: Run WizCLI Dir Scan
-      run: |
-        ./wizcli dir scan --path ${SCAN_PATH} --policy "${CICD_IMG_POLICIES}" --policy-hits-only --output wiz-dir-scan-results.json,sarif,true
-      continue-on-error: true
-
-    - uses: github/codeql-action/upload-sarif@v2
-      with:
-        category: directory-scans
-        sarif_file: wiz-dir-scan-results.json
-      continue-on-error: true
-      if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
-
     - name: Run WizCLI Docker Scan
       run: |
-        ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --policy "${CICD_IMG_POLICIES}" --policy-hits-only --output wiz-image-scan-results.json,sarif,true
-      continue-on-error: true
-
-    - uses: github/codeql-action/upload-sarif@v2
-      with:
-        category: docker-scans
-        sarif_file: wiz-image-scan-results.json
-      continue-on-error: true
-      if: ${{ github.event_name == 'pull_request' && ( success() || failure() ) }}
-
-    #- name: Push Docker Image
-    #  if: ${{ secrets.REGISTRY_USER != '' }}
-    #  run: |
-    #    docker push "${IMAGE}:${TAG}"
-
-    #- name: WizCLI Docker Tag
-    #  if: ${{ secrets.REGISTRY_USER != '' }}
-    #  run: |
-    #    docker images list
-    #    docker images --digests
-    #    ./wizcli docker tag --image "${IMAGE}:${TAG}"
+        ./wizcli docker scan --image "${IMAGE}:${TAG}" --dockerfile "${SCAN_PATH}/Dockerfile" --policy "${CICD_IMG_POLICIES}" --policy-hits-only
