@@ -13,10 +13,8 @@ name: 'wiz-image-scan'
 on: [pull_request]
 
 jobs:
-  wiz-image-scan-container:
+  wiz-cli-image-scan:
     name: 'WizCLI Image Scan'
-    needs: wiz-image-scan
-    if: ${{ github.event_name == 'workflow_dispatch' || needs.wiz-image-scan.outputs.container == 'true' }}
     env:
       SCAN_PATH: 'container'
       CICD_IAC_POLICIES: 'SecCloudDev-Demo-Block-Misconfigurations,SecCloudDev-Demo-Block-Secrets'
