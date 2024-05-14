@@ -14,12 +14,12 @@ on:
     branches:
     - main
     paths:
-      - 'terraform/*'
+      - 'terraform/**'
   push:
     branches:
     - 'main'
     paths:
-    - 'terraform/*'
+    - 'terraform/**'
   workflow_dispatch:
 
 jobs:
