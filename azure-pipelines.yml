@@ -15,17 +15,7 @@ steps:
     command: 'iac'
     clientid: $(WIZ_CLIENT_ID)
     secret: $(WIZ_CLIENT_SECRET)
-    succeedOnFailures: false
-    policyHitsOnly: false
-    scanTags: "cicd=ado,app=terraform"
-    path: '.'
-    name: 'Terraform Code'
-    scanSecrets: true
-- task: wiz@0
-  inputs:
-    command: 'iac'
-    clientid: 'wgxq75hrlndpbktx3eupevf2x37lplq5ap6vhaeqjmuunyddjd4hg'
-    secret: '6UPcE76do9gTBa7Z9nw4zlfZVDlkhVJWktIRRWIdkpeVCasW4zqCOGLrc1ZhMb8a'
     path: 'terraform'
     policyHitsOnly: true
     scanPolicies: 'SecCloudDev-Demo-Audit-Misconfigurations,SecCloudDev-Demo-Audit-Secrets'
+    scanSecrets: true
